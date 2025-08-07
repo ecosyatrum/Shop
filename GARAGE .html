@@ -1,0 +1,4018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BikeTunner - Premium Sports Car & Bike Workshop</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <!-- ... your other meta tags and stylesheets ... -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+    <!-- ... your custom stylesheet ... -->
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <style>
+.notification-popup {
+    position: fixed;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #222;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-size: 14px;
+    z-index: 1000;
+    opacity: 0;
+}
+    /* Base Styles */
+
+:root {
+    --primary-color: #111111;         /* Deep black for text */
+    --secondary-color: #fdfcf7;       /* Creamy white background */
+    --accent-color: #d85c27;          /* Soft orange-brown accent */
+    --dark-gray: #333333;             /* For shadows or borders */
+    --medium-gray: #888888;           /* Subtle divider or muted text */
+    --light-gray: #cccccc;            /* For lines, inputs, subtle borders */
+    --lighter-gray: #f5f3eb;          /* Background highlight, cards, etc. */
+}
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    cursor: none !important;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  width: 100%;
+  cursor: none;
+}
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+}
+
+ul {
+    list-style: none;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+.btn {
+    display: inline-block;
+    padding: 12px 30px;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: none;
+    border-radius: 0;
+    cursor: none;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.btn-primary {
+    background-color: var(--accent-color);
+    color: var(--secondary-color);
+}
+
+.btn-primary:hover {
+    color: var(--secondary-color);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(255, 85, 0, 0.4);
+}
+
+.btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: 0.5s;
+    z-index: -1;
+}
+
+.btn-primary:hover::before {
+    left: 100%;
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: var(--secondary-color);
+    border: 2px solid var(--secondary-color);
+}
+
+.btn-secondary:hover {
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.section-header h2 {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    position: relative;
+    display: inline-block;
+}
+
+.section-header h2 span {
+    color: var(--accent-color);
+}
+
+.section-header p {
+    font-size: 1.1rem;
+    color: var(--light-gray);
+}
+
+.section-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.divider-line {
+    width: 50px;
+    height: 2px;
+    background-color: var(--accent-color);
+}
+
+.divider-gear {
+    width: 30px;
+    height: 30px;
+    margin: 0 15px;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ff5500"><path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z" /></svg>');
+    background-repeat: no-repeat;
+    background-position: center;
+    animation: rotate 6s linear infinite;
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Custom Cursor Styles */
+.custom-cursor {
+    position: fixed;
+    width: 20px;
+    height: 20px;
+    background: #ff5500;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 10000;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease;
+}
+.cursor-wheel {
+    width: 30px;
+    height: 30px;
+    border: 2px solid var(--accent-color);
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    animation: rotate-clockwise 2s linear infinite;
+}
+
+.cursor-spoke {
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background-color: var(--accent-color);
+    top: 50%;
+    left: 0;
+    transform-origin: center;
+}
+
+.cursor-spoke:nth-child(2) {
+    transform: rotate(45deg);
+}
+
+.cursor-spoke:nth-child(3) {
+    transform: rotate(90deg);
+}
+
+.cursor-spoke:nth-child(4) {
+    transform: rotate(135deg);
+}
+
+/* --- Cyber Boot-up Preloader --- */
+.preloader {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.5s ease;
+}
+
+.preloader.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* --- Preloader Content Wrapper --- */
+.preloader-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* --- Logo Glitch Text --- */
+.preloader .logo-text {
+    font-size: clamp(2rem, 8vw, 3rem);
+    font-weight: 900;
+    color: var(--heading-color);
+    position: relative;
+    animation: glitch 2s steps(2, end) infinite;
+    line-height: 1.2;
+    word-break: break-word;
+    text-transform: uppercase;
+}
+
+/* --- Logo Subtext --- */
+.preloader .logo-subtext {
+    font-family: 'Roboto', sans-serif;
+    font-size: clamp(0.7rem, 2.5vw, 1rem);
+    letter-spacing: 5px;
+    color: var(--accent-color);
+    opacity: 0;
+    animation: fadeIn 1s ease 0.5s forwards;
+    text-transform: uppercase;
+}
+
+/* --- Fade In --- */
+@keyframes fadeIn {
+    to { opacity: 0.8; }
+}
+
+/* --- Glitch Animation --- */
+@keyframes glitch {
+    0%   { text-shadow: .05em 0 0 rgba(0,255,255,.75), -.05em -.025em 0 rgba(255,0,0,.75), .025em .05em 0 rgba(0,255,0,.75); }
+    14%  { text-shadow: .05em 0 0 rgba(0,255,255,.75), -.05em -.025em 0 rgba(255,0,0,.75), .025em .05em 0 rgba(0,255,0,.75); }
+    15%  { text-shadow: -.05em -.025em 0 rgba(0,255,255,.75), .025em .025em 0 rgba(255,0,0,.75), -.05em -.05em 0 rgba(0,255,0,.75); }
+    49%  { text-shadow: -.05em -.025em 0 rgba(0,255,255,.75), .025em .025em 0 rgba(255,0,0,.75), -.05em -.05em 0 rgba(0,255,0,.75); }
+    50%  { text-shadow: .025em .05em 0 rgba(0,255,255,.75), .05em 0 0 rgba(255,0,0,.75), 0 -.05em 0 rgba(0,255,0,.75); }
+    99%  { text-shadow: .025em .05em 0 rgba(0,255,255,.75), .05em 0 0 rgba(255,0,0,.75), 0 -.05em 0 rgba(0,255,0,.75); }
+    100% { text-shadow: -.025em 0 0 rgba(0,255,255,.75), -.025em -.025em 0 rgba(255,0,0,.75), -.025em -.05em 0 rgba(0,255,0,.75); }
+}
+/* Header Styles */
+.mechanical-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    background-color: rgba(0, 0, 0, 0.9);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.header-top {
+    background-color: var(--primary-color);
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.contact-info {
+    display: flex;
+    justify-content: space-between;
+    color: var(--secondary-color);
+    font-size: 0.85rem;
+}
+
+.contact-info span {
+    margin-right: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.contact-info i {
+    margin-right: 5px;
+    color: var(--accent-color);
+}
+
+.social-links {
+    display: flex;
+}
+
+.social-links a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 25px;
+    height: 25px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--secondary-color);
+    border-radius: 50%;
+    margin-left: 10px;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+}
+
+.social-links a:hover {
+    background-color: var(--accent-color);
+    transform: translateY(-3px);
+}
+
+.mechanical-nav {
+    padding: 15px 0;
+    transition: all 0.3s ease;
+}
+
+.mechanical-nav.scrolled {
+    padding: 10px 0;
+    background-color: rgba(0, 0, 0, 0.95);
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    flex-direction: column;
+}
+
+.logo-text {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--secondary-color);
+    letter-spacing: 3px;
+    line-height: 1;
+}
+
+.logo-subtext {
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.7rem;
+    color: var(--accent-color);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 3px;
+}
+
+.logo-graphic {
+    margin-left: 15px;
+    position: relative;
+    width: 40px;
+    height: 40px;
+}
+
+.piston-animation {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.piston-rod {
+    position: absolute;
+    width: 6px;
+    height: 25px;
+    background-color: var(--accent-color);
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
+    animation: piston-move 2s ease-in-out infinite;
+}
+
+.piston-head {
+    position: absolute;
+    width: 20px;
+    height: 12px;
+    background-color: var(--secondary-color);
+    border-radius: 3px;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+}
+
+@keyframes piston-move {
+    0%, 100% {
+        height: 25px;
+    }
+    50% {
+        height: 35px;
+    }
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+}
+
+.nav-links a {
+    color: var(--secondary-color);
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    margin: 0 12px;
+    position: relative;
+    padding: 5px 0;
+}
+
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--accent-color);
+    transition: width 0.3s ease;
+}
+
+.nav-links a:hover::after,
+.nav-links a.active::after {
+    width: 100%;
+}
+
+.cart-icon {
+    position: relative;
+    margin-left: 20px;
+    font-size: 1.1rem;
+}
+
+.cart-count {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: var(--accent-color);
+    color: var(--secondary-color);
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-family: 'Roboto', sans-serif;
+}
+
+.mobile-menu-btn {
+    display: none;
+    width: 30px;
+    height: 20px;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: none;
+    margin-left: auto;
+}
+
+.menu-bar {
+    width: 100%;
+    height: 3px;
+    background-color: var(--secondary-color);
+    transition: all 0.3s ease;
+}
+
+.mobile-menu-btn.active .menu-bar:nth-child(1) {
+    transform: translateY(8.5px) rotate(45deg);
+}
+
+.mobile-menu-btn.active .menu-bar:nth-child(2) {
+    opacity: 0;
+}
+
+.mobile-menu-btn.active .menu-bar:nth-child(3) {
+    transform: translateY(-8.5px) rotate(-45deg);
+}
+/* Hero Section Styles */
+.mechanical-hero {
+    position: relative;
+    height: 100vh;
+    min-height: 700px;
+    display: flex;
+    align-items: center;
+    background-color: var(--primary-color);
+    overflow: hidden;
+    margin-top: 80px;
+}
+
+        .hero-background {
+  background-size: cover;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+}
+.gear-overlay {
+    position: absolute;
+    background-size: contain;
+    background-repeat: no-repeat;
+    opacity: 0.1;
+    z-index: 2;
+}
+
+.gear-1,
+.gear-2,
+.gear-3 {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ffffff"><path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z" /></svg>');
+}
+
+.gear-1 {
+    width: 200px;
+    height: 200px;
+    top: 10%;
+    left: 10%;
+    animation: rotate-clockwise 20s linear infinite;
+}
+
+.gear-2 {
+    width: 150px;
+    height: 150px;
+    bottom: 15%;
+    right: 15%;
+    animation: rotate-counterclockwise 15s linear infinite;
+}
+
+.gear-3 {
+    width: 100px;
+    height: 100px;
+    top: 30%;
+    right: 20%;
+    animation: rotate-clockwise 12s linear infinite;
+}
+
+@keyframes rotate-clockwise {
+    0% {
+        transform: rotate(0);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes rotate-counterclockwise {
+    0% {
+        transform: rotate(0);
+    }
+    100% {
+        transform: rotate(-360deg);
+    }
+}
+
+.piston-overlay {
+    position: absolute;
+    background-color: rgba(255, 85, 0, 0.1);
+    z-index: 2;
+}
+
+.piston-1 {
+    width: 80px;
+    height: 200px;
+    top: 50%;
+    left: 20%;
+    transform: translateY(-50%);
+    animation: piston-move-overlay 3s ease-in-out infinite;
+}
+
+.piston-2 {
+    width: 60px;
+    height: 150px;
+    bottom: 20%;
+    left: 30%;
+    animation: piston-move-overlay 2.5s ease-in-out infinite 0.5s;
+}
+
+@keyframes piston-move-overlay {
+    0%, 100% {
+        height: 150px;
+    }
+    50% {
+        height: 200px;
+    }
+}
+
+.hero-content {
+    position: relative;
+    z-index: 3;
+    color: var(--secondary-color);
+    max-width: 600px;
+}
+
+.hero-content h1 {
+    font-size: 3.5rem;
+    margin-bottom: 20px;
+    line-height: 1.2;
+}
+
+.hero-content h1 .highlight {
+    color: var(--accent-color);
+}
+
+.hero-content p {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+    opacity: 0.9;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 15px;
+}
+
+.hero-image {
+    position: absolute;
+    right: 5%;
+    bottom: 0;
+    width: 50%;
+    max-width: 700px;
+    z-index: 3;
+}
+
+.bike-animation {
+    position: relative;
+    width: 100%;
+    height: 400px;
+}
+
+.bike-frame {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.bike-wheel {
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    border: 8px solid var(--secondary-color);
+    border-radius: 50%;
+    bottom: 0;
+}
+
+.front-wheel {
+    left: 30%;
+}
+
+.rear-wheel {
+    right: 30%;
+}
+
+.wheel-spokes {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    animation: rotate-clockwise 2s linear infinite;
+}
+
+.wheel-spokes::before,
+.wheel-spokes::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background-color: var(--secondary-color);
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+}
+
+.wheel-spokes::after {
+    transform: translateY(-50%) rotate(90deg);
+}
+
+.bike-engine {
+    position: absolute;
+    width: 200px;
+    height: 100px;
+    background-color: var(--medium-gray);
+    border-radius: 10px;
+    bottom: 75px;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid var(--dark-gray);
+}
+
+.engine-detail {
+    position: absolute;
+    width: 80%;
+    height: 40px;
+    background-color: var(--dark-gray);
+    border-radius: 5px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.scrolling-indicator {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    color: var(--secondary-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: bounce 2s infinite;
+}
+
+.mouse {
+    width: 25px;
+    height: 40px;
+    border: 2px solid var(--secondary-color);
+    border-radius: 15px;
+    position: relative;
+    margin-bottom: 5px;
+}
+
+.wheel {
+    width: 4px;
+    height: 8px;
+    background-color: var(--secondary-color);
+    border-radius: 2px;
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: scroll-wheel 2s infinite;
+}
+
+.arrow-down {
+    width: 15px;
+    height: 15px;
+    border-right: 2px solid var(--secondary-color);
+    border-bottom: 2px solid var(--secondary-color);
+    transform: rotate(45deg);
+    margin-top: 5px;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0) translateX(-50%);
+    }
+    40% {
+        transform: translateY(-20px) translateX(-50%);
+    }
+    60% {
+        transform: translateY(-10px) translateX(-50%);
+    }
+}
+
+@keyframes scroll-wheel {
+    0% {
+        opacity: 1;
+        transform: translateY(0) translateX(-50%);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(10px) translateX(-50%);
+    }
+}
+
+/* Typing Animation */
+.typing-animation {
+    overflow: hidden;
+    white-space: nowrap;
+    border-right: 3px solid var(--accent-color);
+    animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+}
+
+@keyframes typing {
+    from {
+        width: 0;
+    }
+    to {
+        width: 100%;
+    }
+}
+
+@keyframes blink-caret {
+    from, to {
+        border-color: transparent;
+    }
+    50% {
+        border-color: var(--accent-color);
+    }
+}
+
+/* Slide Up Animation */
+.slide-up-animation {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: slideUp 1s ease forwards 1.5s;
+}
+
+@keyframes slideUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Slide In Animations */
+.slide-in-left {
+    opacity: 0;
+    transform: translateX(-50px);
+    animation: slideInLeft 1s ease forwards 2s;
+}
+
+.slide-in-right {
+    opacity: 0;
+    transform: translateX(50px);
+    animation: slideInRight 1s ease forwards 2s;
+}
+
+@keyframes slideInLeft {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInRight {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}/* Services Section Styles */
+.mechanical-services {
+    padding: 100px 0;
+    background-color: var(--secondary-color);
+    position: relative;
+    overflow: hidden;
+}
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+}
+
+.service-card {
+    background-color: var(--secondary-color);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 40px 30px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    z-index: 1;
+}
+
+.service-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.03) 0%, rgba(0, 0, 0, 0) 100%);
+    z-index: -1;
+}
+
+.service-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+.service-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 25px;
+    position: relative;
+}
+
+.gear-icon {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: var(--primary-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--secondary-color);
+    font-size: 2rem;
+    transition: all 0.3s ease;
+}
+
+.service-card:hover .gear-icon {
+    background-color: var(--accent-color);
+    transform: rotate(15deg);
+}
+
+.service-card h3 {
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    color: var(--primary-color);
+}
+
+.service-card p {
+    color: var(--light-gray);
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+}
+
+.service-link {
+    color: var(--accent-color);
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: inline-flex;
+    align-items: center;
+}
+
+.service-link i {
+    margin-left: 5px;
+    transition: transform 0.3s ease;
+}
+
+.service-link:hover i {
+    transform: translateX(5px);
+}
+
+.service-hover-effect {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: var(--accent-color);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+}
+
+.service-card:hover .service-hover-effect {
+    transform: scaleX(1);
+}
+
+/* About Section Styles */
+.mechanical-about {
+    padding: 100px 0;
+    background-color: var(--lighter-gray);
+    position: relative;
+}
+
+.mechanical-about .container {
+    display: flex;
+    align-items: center;
+    gap: 50px;
+}
+
+.about-content {
+    flex: 1;
+}
+
+.about-image {
+    flex: 1;
+    position: relative;
+}
+
+.image-container {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    background-color: var(--dark-gray);
+    border: 10px solid var(--primary-color);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.mech-animation {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.mech-arm {
+    position: absolute;
+    width: 20px;
+    height: 100px;
+    background-color: var(--secondary-color);
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    transform-origin: top center;
+    animation: mech-arm-move 2s ease-in-out infinite;
+}
+
+.mech-tool {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background-color: var(--accent-color);
+    border-radius: 50%;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+@keyframes mech-arm-move {
+    0%, 100% {
+        transform: translateX(-50%) rotate(-15deg);
+    }
+    50% {
+        transform: translateX(-50%) rotate(15deg);
+    }
+}
+
+.about-features {
+    margin-top: 40px;
+}
+
+.feature-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 25px;
+}
+
+.feature-icon {
+    width: 50px;
+    height: 50px;
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-right: 20px;
+    flex-shrink: 0;
+}
+
+.feature-text h4 {
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+    color: var(--primary-color);
+}
+
+.feature-text p {
+    color: var(--light-gray);
+    font-size: 0.95rem;
+}
+
+/* Gallery Section Styles */
+.mechanical-gallery {
+    padding: 100px 0;
+    background-color: var(--secondary-color);
+}
+
+.gallery-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.gallery-item {
+    position: relative;
+    overflow: hidden;
+    height: 250px;
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.gallery-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    padding: 20px;
+    text-align: center;
+}
+
+.gallery-overlay h3 {
+    color: var(--secondary-color);
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    transform: translateY(-20px);
+    transition: transform 0.3s ease;
+}
+
+.gallery-overlay p {
+    color: var(--secondary-color);
+    margin-bottom: 20px;
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+}
+
+.gallery-btn {
+    padding: 8px 20px;
+    background-color: var(--accent-color);
+    color: var(--secondary-color);
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.3s ease 0.1s;
+}
+
+.gallery-btn:hover {
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+}
+
+.gallery-item:hover img {
+    transform: scale(1.1);
+}
+
+.gallery-item:hover .gallery-overlay {
+    opacity: 1;
+}
+
+.gallery-item:hover .gallery-overlay h3,
+.gallery-item:hover .gallery-overlay p {
+    transform: translateY(0);
+}
+
+.gallery-item:hover .gallery-btn {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.gallery-cta {
+    text-align: center;
+}
+
+/* Shop Section Styles */
+.mechanical-shop {
+    padding: 100px 0;
+    background-color: var(--lighter-gray);
+}
+
+.shop-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.product-card {
+    background-color: var(--secondary-color);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    position: relative;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.product-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+.product-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: var(--accent-color);
+    color: var(--secondary-color);
+    padding: 5px 10px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    z-index: 2;
+}
+
+.product-image {
+    position: relative;
+    overflow: hidden;
+    height: 200px;
+}
+
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.product-actions {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.quick-view,
+.add-wishlist {
+    width: 35px;
+    height: 35px;
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    cursor: none;
+    transition: all 0.3s ease;
+}
+
+.quick-view:hover,
+.add-wishlist:hover {
+    background-color: var(--accent-color);
+    color: var(--secondary-color);
+}
+
+.product-details {
+    padding: 20px;
+}
+
+.product-details h3 {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    color: var(--primary-color);
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700;
+}
+
+.product-price {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--accent-color);
+    margin-bottom: 10px;
+}
+
+.old-price {
+    text-decoration: line-through;
+    color: var(--light-gray);
+    font-size: 0.9rem;
+    margin-right: 5px;
+}
+
+.product-rating {
+    color: var(--accent-color);
+    margin-bottom: 15px;
+    font-size: 0.8rem;
+}
+
+.product-rating span {
+    color: var(--light-gray);
+    margin-left: 5px;
+}
+
+.add-to-cart {
+    width: 100%;
+    padding: 10px;
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    border: none;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: none;
+    transition: all 0.3s ease;
+}
+
+.add-to-cart:hover {
+    background-color: var(--accent-color);
+}
+
+.product-card:hover .product-image img {
+    transform: scale(1.05);
+}
+
+.product-card:hover .product-actions {
+    opacity: 1;
+}
+
+.shop-cta {
+    text-align: center;
+}
+
+/* Testimonials Section Styles */
+.mechanical-testimonials {
+    padding: 100px 0;
+    background-color: var(--secondary-color);
+}
+
+.testimonial-slider {
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.testimonial-slide {
+    display: none;
+    animation: fade 1s ease;
+}
+
+.testimonial-slide.active {
+    display: block;
+}
+
+@keyframes fade {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.testimonial-content {
+    background-color: var(--lighter-gray);
+    padding: 40px;
+    border-radius: 5px;
+    position: relative;
+    text-align: center;
+}
+
+.testimonial-quote {
+    margin-bottom: 30px;
+    position: relative;
+}
+
+.testimonial-quote i:first-child {
+    position: absolute;
+    top: -20px;
+    left: -10px;
+    font-size: 3rem;
+    color: rgba(0, 0, 0, 0.1);
+}
+
+.testimonial-quote i:last-child {
+    position: absolute;
+    bottom: -40px;
+    right: -10px;
+    font-size: 3rem;
+    color: rgba(0, 0, 0, 0.1);
+}
+
+.testimonial-quote p {
+    font-size: 1.1rem;
+    font-style: italic;
+    color: var(--medium-gray);
+    position: relative;
+    z-index: 1;
+}
+
+.testimonial-author {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.author-image {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid var(--accent-color);
+}
+
+.author-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.author-info h4 {
+    font-size: 1.1rem;
+    color: var(--primary-color);
+    margin-bottom: 5px;
+}
+
+.author-info span {
+    font-size: 0.9rem;
+    color: var(--light-gray);
+    display: block;
+    margin-bottom: 5px;
+}
+
+.testimonial-rating {
+    color: var(--accent-color);
+    font-size: 0.8rem;
+}
+
+.testimonial-controls {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    transform: translateY(-50%);
+    z-index: 2;
+}
+
+.testimonial-prev,
+.testimonial-next {
+    width: 40px;
+    height: 40px;
+    background-color: var(--accent-color);
+    color: var(--secondary-color);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    cursor: none;
+    transition: all 0.3s ease;
+}
+
+.testimonial-prev:hover,
+.testimonial-next:hover {
+    background-color: var(--primary-color);
+}
+
+.testimonial-prev {
+    transform: translateX(-50%);
+}
+
+.testimonial-next {
+    transform: translateX(50%);
+}
+
+.testimonial-dots {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    background-color: var(--lighter-gray);
+    border-radius: 50%;
+    cursor: none;
+    transition: all 0.3s ease;
+}
+
+.dot.active {
+    background-color: var(--accent-color);
+    transform: scale(1.2);
+}
+
+/* Blog Section Styles */
+.mechanical-blog {
+    padding: 100px 0;
+    background-color: var(--lighter-gray);
+}
+
+.blog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.blog-card {
+    background-color: var(--secondary-color);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.blog-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+.blog-image {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+}
+
+.blog-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.blog-date {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: var(--accent-color);
+    color: var(--secondary-color);
+    text-align: center;
+    padding: 10px;
+    line-height: 1;
+    z-index: 2;
+}
+
+.date-day {
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: block;
+}
+
+.date-month {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: block;
+}
+
+.blog-content {
+    padding: 25px;
+}
+
+.blog-meta {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 10px;
+    font-size: 0.8rem;
+    color: var(--light-gray);
+}
+
+.blog-meta span {
+    display: flex;
+    align-items: center;
+}
+
+.blog-meta i {
+    margin-right: 5px;
+}
+
+.blog-content h3 {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    font-family: 'Roboto', sans-serif;
+    color: var(--primary-color);
+}
+
+.blog-content h3 a {
+    transition: color 0.3s ease;
+}
+
+.blog-content h3 a:hover {
+    color: var(--accent-color);
+}
+
+.blog-content p {
+    color: var(--light-gray);
+    margin-bottom: 15px;
+    font-size: 0.95rem;
+}
+
+.blog-read-more {
+    color: var(--accent-color);
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+}
+
+.blog-read-more i {
+    margin-left: 5px;
+    transition: transform 0.3s ease;
+}
+
+.blog-read-more:hover i {
+    transform: translateX(5px);
+}
+
+.blog-card:hover .blog-image img {
+    transform: scale(1.1);
+}
+
+#map {
+    height: 150px;
+    width: 100%;
+    max-width: 300px;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin: 0 auto; /* Center it inside parent */
+}
+
+/* Mobile-specific adjustment */
+@media (max-width: 600px) {
+    #map {
+        height: 120px;
+        max-width: 100%;
+        border-radius: 6px;
+    }
+}
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+    #leaflet-map {
+        height: 400px;
+    }
+    .address-box {
+        position: relative;
+        left: 0;
+        top: 0;
+        max-width: 100%;
+        border-radius: 0 0 8px 8px;
+        border-left: none;
+        border-top: 5px solid #ff5500;
+        margin-top: -5px; /* Pulls it up slightly over the map's bottom edge */
+    }
+}
+ 
+/* --- Advanced Appointment Scheduler --- */
+.appointment-section {
+    padding: 100px 20px;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+}
+
+.scheduler-container {
+    max-width: 700px;
+    margin: 0 auto;
+    color: var(--secondary-color);
+}
+
+.scheduler-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.scheduler-header h2 {
+    font-size: 2.5rem;
+}
+.scheduler-header h2 span {
+    color: var(--accent-color);
+}
+
+.scheduler-card {
+    background: #222;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    overflow: hidden; /* Important for animations */
+}
+
+.progress-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+}
+.progress-bar__step {
+    color: var(--medium-gray);
+    font-family: 'Orbitron', sans-serif;
+    transition: color 0.4s ease;
+}
+.progress-bar__step.active {
+    color: var(--accent-color);
+}
+.progress-bar__line {
+    flex-grow: 1;
+    height: 2px;
+    background: #444;
+    margin: 0 15px;
+}
+
+.scheduler-form {
+    position: relative;
+    min-height: 300px; /* Adjust as needed */
+}
+
+.scheduler__step {
+    position: absolute;
+    width: 100%;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(30px);
+    transition: opacity 0.5s ease, visibility 0.5s ease, transform 0.5s ease;
+}
+
+.scheduler__step.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+}
+
+.scheduler__step.exit {
+    transform: translateX(-30px);
+}
+
+.scheduler__step h4 {
+    font-size: 1.5rem;
+    margin-bottom: 30px;
+    text-align: center;
+    color: var(--secondary-color);
+}
+
+/* Step 1: Service Options */
+.service-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.service-option {
+    background: #333;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+.service-option:hover {
+    background: #444;
+    transform: translateY(-5px);
+}
+.service-option.selected {
+    border-color: var(--accent-color);
+    background: rgba(216, 92, 39, 0.1);
+}
+.service-option i {
+    font-size: 2rem;
+    color: var(--accent-color);
+    display: block;
+    margin-bottom: 15px;
+}
+.service-option span {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700;
+}
+
+/* Step 2: Date & Time */
+#datePicker {
+    width: 100%;
+    padding: 15px;
+    background: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-family: 'Roboto', sans-serif;
+    margin-bottom: 20px;
+    text-align: center;
+}
+.time-slots {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 30px;
+    min-height: 100px;
+}
+.time-slot {
+    background: #333;
+    padding: 12px;
+    border-radius: 5px;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+.time-slot:hover {
+    background: #555;
+}
+.time-slot.selected {
+    background: var(--accent-color);
+    color: var(--primary-color);
+    font-weight: 700;
+}
+.time-slot.disabled {
+    background: #282828;
+    color: #555;
+    cursor: not-allowed;
+    text-decoration: line-through;
+}
+
+/* Step 3: Details & Navigation */
+.scheduler__step input {
+    width: 100%;
+    padding: 15px;
+    background: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    margin-bottom: 20px;
+    font-family: 'Roboto', sans-serif;
+}
+.step-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+/* Submit Button Animation */
+.submit-btn {
+    position: relative;
+    transition: padding-right 0.3s ease;
+}
+.submit-btn .btn-loader {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    animation: spin 1s linear infinite;
+}
+.submit-btn.loading {
+    padding-right: 40px; /* Make space for loader */
+}
+.submit-btn.loading .btn-text {
+    opacity: 0;
+}
+.submit-btn.loading .btn-loader {
+    opacity: 1;
+}
+@keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+
+/* Step 4: Success Message */
+.scheduler__success {
+    text-align: center;
+}
+.success-checkmark {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 20px;
+}
+.success-checkmark__circle {
+    stroke-dasharray: 166;
+    stroke-dashoffset: 166;
+    stroke-width: 3;
+    stroke-miterlimit: 10;
+    stroke: var(--accent-color);
+    fill: none;
+    animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+.success-checkmark__check {
+    transform-origin: 50% 50%;
+    stroke-dasharray: 48;
+    stroke-dashoffset: 48;
+    stroke-width: 4;
+    stroke: var(--accent-color);
+    animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+}
+@keyframes stroke {
+    100% { stroke-dashoffset: 0; }
+}
+/* CTA Section Styles */
+.mechanical-cta {
+    padding: 100px 0;
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+}
+
+.cta-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.9)), url('images/cta-bg.jpg') no-repeat center center/cover;
+    z-index: 1;
+}
+
+.cta-gear {
+    position: absolute;
+    background-size: contain;
+    background-repeat: no-repeat;
+    opacity: 0.1;
+    z-index: 2;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ffffff"><path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z" /></svg>');
+}
+.cta-gear1 {
+    width: 150px;
+    height: 150px;
+    top: 20%;
+    left: 10%;
+    animation: rotate-clockwise 15s linear infinite;
+}
+
+.cta-gear2 {
+    width: 100px;
+    height: 100px;
+    bottom: 15%;
+    right: 15%;
+    animation: rotate-counterclockwise 12s linear infinite;
+}
+
+.cta-gear3 {
+    width: 80px;
+    height: 80px;
+    top: 30%;
+    right: 20%;
+    animation: rotate-clockwise 10s linear infinite;
+}
+
+.cta-content {
+    position: relative;
+    z-index: 3;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.cta-content h2 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    line-height: 1.3;
+}
+
+.cta-content h2 span {
+    color: var(--accent-color);
+}
+
+.cta-content p {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+    opacity: 0.9;
+}
+
+.cta-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+/* Footer Styles */
+.mechanical-footer {
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    position: relative;
+}
+
+.footer-top {
+    padding: 80px 0 50px;
+}
+
+.footer-widget {
+    margin-bottom: 30px;
+}
+
+.footer-widget h3 {
+    font-size: 1.3rem;
+    margin-bottom: 25px;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.footer-widget h3::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 2px;
+    background-color: var(--accent-color);
+}
+
+.footer-logo {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.footer-logo .logo-text {
+    font-size: 1.8rem;
+}
+
+.footer-logo .logo-subtext {
+    font-size: 0.7rem;
+}
+
+.footer-widget p {
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+}
+#map {
+    height: 200px;
+    width: 100%;
+    border: none;
+    border-radius: 8px;
+    filter: grayscale(1) invert(1);
+}
+
+.footer-social {
+    display: flex;
+    gap: 10px;
+}
+
+.footer-social a {
+    width: 35px;
+    height: 35px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--secondary-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.footer-social a:hover {
+    background-color: var(--accent-color);
+    transform: translateY(-3px);
+}
+
+.footer-links li {
+    margin-bottom: 10px;
+}
+
+.footer-links a {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.footer-links a:hover {
+    color: var(--accent-color);
+    transform: translateX(5px);
+}
+
+.footer-contact li {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: flex-start;
+}
+
+.footer-contact i {
+    color: var(--accent-color);
+    margin-right: 10px;
+    font-size: 1rem;
+    margin-top: 3px;
+}
+
+.footer-contact span {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.95rem;
+    flex: 1;
+}
+
+.footer-bottom {
+    padding: 20px 0;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.copyright {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.9rem;
+}
+
+.footer-links-bottom {
+    display: flex;
+    gap: 15px;
+}
+
+.footer-links-bottom a {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.footer-links-bottom a:hover {
+    color: var(--accent-color);
+}
+
+/* Client Brands Section */
+.client-brands {
+    padding: 80px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.brands-carousel-container {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    margin: 40px 0;
+}
+
+.brands-track {
+    display: flex;
+    animation: scroll 30s linear infinite;
+    width: calc(250px * 12); /* Width of all logos including duplicates */
+}
+
+.brand-logo {
+    width: 200px;
+    height: 100px;
+    margin: 0 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    filter: grayscale(100%) brightness(2);
+    transition: all 0.5s ease;
+}
+
+.brand-logo img {
+    max-width: 100%;
+    max-height: 80px;
+    object-fit: contain;
+    transition: all 0.5s ease;
+}
+
+.brand-logo:hover {
+    filter: grayscale(0%) brightness(1);
+}
+
+.brand-logo:hover img {
+    transform: scale(1.1);
+}
+.spark {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    background: gold;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+.calendar-popup {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #111;
+    padding: 20px 30px;
+    color: #fff;
+    border-radius: 10px;
+    font-size: 16px;
+    z-index: 9999;
+    text-align: center;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+}
+
+.add-calendar-btn {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 8px 16px;
+    background: #00b4d8;
+    color: #fff;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.cursor-dot {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    background: rgba(0, 255, 255, 0.8);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99999;
+    box-shadow: 0 0 8px cyan;
+    mix-blend-mode: difference;
+}
+
+.logo-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 50%, rgba(0,0,0,0.8) 100%);
+    opacity: 0.3;
+    transition: all 0.5s ease;
+}
+
+.brand-logo:hover .logo-overlay {
+    opacity: 0;
+}
+
+@keyframes scroll {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(calc(-250px * 6)); /* Move by half the width */
+    }
+}
+
+.cycle-animation {
+    position: relative;
+    width: 300px;
+    height: 150px;
+    margin: 40px auto 0;
+}
+
+.cycle-animation .bike-frame {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.cycle-animation .bike-wheel {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    border: 4px solid var(--accent-color);
+    border-radius: 50%;
+    bottom: 0;
+    animation: rotate-clockwise 3s linear infinite;
+}
+
+.cycle-animation .front-wheel {
+    left: 30%;
+}
+
+.cycle-animation .rear-wheel {
+    right: 30%;
+}
+
+.cycle-animation .bike-chain {
+    position: absolute;
+    width: 40%;
+    height: 8px;
+    background-color: var(--accent-color);
+    bottom: 35px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 4px;
+    animation: chain-move 1s linear infinite;
+}
+
+@keyframes chain-move {
+    0% {
+        background: linear-gradient(90deg, var(--accent-color) 0%, var(--secondary-color) 50%, var(--accent-color) 100%);
+        background-position: 0 0;
+    }
+    100% {
+        background: linear-gradient(90deg, var(--accent-color) 0%, var(--secondary-color) 50%, var(--accent-color) 100%);
+        background-position: 40px 0;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .brand-logo {
+        width: 150px;
+        margin: 0 15px;
+    }
+    
+    .brands-track {
+        animation: scroll 20s linear infinite;
+    }
+    
+    .cycle-animation {
+        width: 250px;
+        height: 120px;
+    }
+    
+    .cycle-animation .bike-wheel {
+        width: 60px;
+        height: 60px;
+    }
+}
+/* Back to Top Button */
+.back-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background-color: var(--accent-color);
+    color: var(--secondary-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    cursor: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 999;
+}
+
+.back-to-top.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.back-to-top:hover {
+    background-color: var(--primary-color);
+    transform: translateY(-5px);
+}
+/* Client Logo Slider */
+.client-slider-section {
+  padding: 60px 0;
+  overflow: hidden;
+}
+
+.client-slider-section h3 {
+  font-family: 'Orbitron', sans-serif;
+  text-align: center;
+  font-size: 1.5rem;
+  margin-bottom: 40px;
+  letter-spacing: 2px;
+}
+
+.client-slider {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.slider-track {
+  display: flex;
+  width: calc(150px * 10); /* Width of all slides */
+  animation: scroll 20s linear infinite;
+}
+
+.slide {
+  width: 150px;
+  height: 80px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+  filter: grayscale(100%) brightness(2);
+  transition: all 0.3s ease;
+}
+
+.slide:hover {
+  filter: grayscale(0%) brightness(1);
+}
+
+.slide img {
+  max-width: 100%;
+  max-height: 60px;
+  object-fit: contain;
+}
+
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(calc(-150px * 5)); } /* Move by half the width */
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .slider-track {
+    animation: scroll 15s linear infinite;
+  }
+  
+  .slide {
+    width: 120px;
+    height: 60px;
+  }
+}
+/* Responsive Styles */
+@media (max-width: 1200px) {
+    .hero-content h1 {
+        font-size: 3rem;
+    }
+    
+    .hero-image {
+        width: 45%;
+    }
+}
+
+@media (max-width: 992px) {
+    .mechanical-about .container {
+        flex-direction: column;
+    }
+    
+    .about-image {
+        margin-top: 50px;
+    }
+    
+    .hero-content h1 {
+        font-size: 2.5rem;
+    }
+    
+    .hero-image {
+        width: 40%;
+        height: 300px;
+    }
+    
+    .contact-info {
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .contact-info span {
+        margin-right: 0;
+    }
+    
+    .social-links {
+        margin-top: 10px;
+        justify-content: flex-end;
+    }
+}
+
+@media (max-width: 768px) {
+    .mobile-menu-btn {
+        display: flex;
+    }
+    
+    .nav-links {
+        position: fixed;
+        top: 120px;
+        left: 0;
+        width: 100%;
+        background-color: var(--primary-color);
+        flex-direction: column;
+        align-items: center;
+        padding: 20px 0;
+        gap: 15px;
+        clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+        transition: clip-path 0.5s ease;
+    }
+    
+    .nav-links.active {
+        clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    }
+    
+    .hero-content {
+        text-align: center;
+        margin: 0 auto;
+    }
+    
+    .hero-buttons {
+        justify-content: center;
+    }
+    
+    .hero-image {
+        display: none;
+    }
+    
+    .mechanical-hero {
+        text-align: center;
+        margin-top: 60px;
+    }
+    
+    .feature-item {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .feature-icon {
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+    
+    .testimonial-prev {
+        transform: translateX(-20px);
+    }
+    
+    .testimonial-next {
+        transform: translateX(20px);
+    }
+    
+    .footer-top .container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .section-header h2 {
+        font-size: 2rem;
+    }
+    
+    .hero-content h1 {
+        font-size: 2rem;
+    }
+    
+    .hero-content p {
+        font-size: 1rem;
+    }
+    
+    .btn {
+        padding: 10px 20px;
+        font-size: 0.8rem;
+    }
+    
+    .cta-content h2 {
+        font-size: 2rem;
+    }
+    
+    .cta-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .footer-top .container {
+        grid-template-columns: 1fr;
+    }
+    
+    .footer-widget {
+        text-align: center;
+    }
+    
+    .footer-widget h3::after {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    
+    .footer-social {
+        justify-content: center;
+    }
+    
+    .footer-bottom .container {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    
+    .footer-links-bottom {
+        justify-content: center;
+    }
+    
+    /* Adjust preloader for mobile */
+    .loading-text .logo-text {
+        font-size: 2rem;
+    }
+    
+    .loading-text .logo-subtext {
+        font-size: 0.8rem;
+    }
+    
+    .road {
+        height: 60px;
+    }
+    
+    .bike {
+        width: 100px;
+    }
+    
+    .bike-wheel {
+        width: 30px;
+        height: 30px;
+    }
+    
+    .front-wheel {
+        left: 15px;
+    }
+    
+    .rear-wheel {
+        right: 15px;
+    }
+}
+
+/* Touch devices - disable custom cursor */
+@media (hover: none) {
+    .custom-cursor {
+        display: none !important;
+    }
+    
+    * {
+        cursor: default !important;
+    }
+}
+     </style>
+<style>
+/* Base Styles */
+:root {
+    --primary-color: #000000;         /* Black for text */
+    --secondary-color: #ffffff;       /* White background */
+    --accent-color: #d8b65c;          /* Gold accent for highlights */
+    --dark-gray: #333333;             /* For shadows or borders */
+    --medium-gray: #888888;           /* Subtle divider or muted text */
+    --light-gray: #cccccc;            /* For lines, inputs, subtle borders */
+    --lighter-gray: #f5f3eb;          /* Background highlight, cards, etc. */
+}
+
+/* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    font-family: 'Georgia', serif; /* Elegant font for old money theme */
+    color: var(--primary-color);
+    background-color: var(--secondary-color);
+    overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+    transition: color 0.3s ease;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+/* Header Styles */
+.mechanical-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s ease;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+}
+
+.nav-links a {
+    color: var(--primary-color);
+    font-weight: 700;
+    font-size: 1rem;
+    margin: 0 15px;
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.nav-links a:hover {
+    background-color: var(--accent-color);
+    color: var(--secondary-color);
+}
+
+/* Button Styles */
+.btn {
+    display: inline-block;
+    padding: 12px 30px;
+    font-weight: 700;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 5px;
+    background-color: var(--accent-color);
+    color: var(--secondary-color);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(216, 182, 92, 0.5);
+}
+
+/* Section Styles */
+.section-header {
+    text-align: center;
+    margin: 60px 0;
+}
+
+.section-header h2 {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+}
+
+.section-header p {
+    font-size: 1.1rem;
+    color: var(--light-gray);
+}
+
+/* Advanced Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.section {
+    padding: 60px 0;
+    animation: fadeIn 0.8s ease forwards;
+}
+
+/* Footer Styles */
+.mechanical-footer {
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    padding: 40px 0;
+}
+
+.footer-widget h3 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.footer-widget h3::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 50px;
+    height: 2px;
+    background-color: var(--accent-color);
+}
+
+/* Notification Popup */
+.notification-popup {
+    position: fixed;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #222;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-size: 14px;
+    z-index: 1000;
+    opacity: 0;
+}
+
+/* Custom Cursor Styles */
+.custom-cursor {
+    position: fixed;
+    width: 20px;
+    height: 20px;
+    background: var(--accent-color);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 10000;
+    transform: translate(-50%, -50%);
+}
+
+/* Back to Top Button */
+.back-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background-color: var(--accent-color);
+    color: var(--secondary-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    cursor: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 999;
+}
+
+.back-to-top.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.back-to-top:hover {
+    background-color: var(--primary-color);
+    transform: translateY(-5px);
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+    .mobile-menu-btn {
+        display: flex; /* Show mobile menu button */
+    }
+
+    .nav-links {
+        position: fixed;
+        top: 60px; /* Adjusted for mobile */
+        left: 0;
+        width: 100%;
+        background-color: rgba(255, 255, 255, 0.9); /* More transparent background */
+        flex-direction: column;
+        align-items: center;
+        padding: 20px 0;
+        gap: 15px;
+        clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+        transition: clip-path 0.5s ease;
+    }
+
+    .nav-links.active {
+        clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    }
+}
+</style>
+
+
+
+</head>
+<body>
+    <!-- Custom Cursor -->
+    <div class="custom-cursor">
+        <div class="cursor-wheel"></div>
+        <div class="cursor-spoke"></div>
+        <div class="cursor-spoke"></div>
+        <div class="cursor-spoke"></div>
+        <div class="cursor-spoke"></div>
+    </div>
+
+    <!-- Preloader -->
+    <div class="preloader">
+        <div class="preloader-content">
+            <h1 class="logo-text">BIKETUNNER</h1>
+            <h3 class="logo-subtext">INITIALIZING SYSTEMS...</h3>
+        </div>
+    </div>
+    <!-- Header -->
+    <header class="mechanical-header">
+
+        <nav class="mechanical-nav">
+            <div class="container">
+                <div class="logo-container">
+                    <a href="#mechanical-footer" class="logo">
+                        <span class="logo-text">BIKETUNNER</span>
+                        <span class="logo-subtext">PERFORMANCE WORKSHOP</span>
+                    </a>
+                    <div class="logo-graphic">
+                        <div class="piston-animation">
+                            <div class="piston-rod"></div>
+                            <div class="piston-head"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="nav-links">
+                    <a href="index.html" class="active">HOME</a>
+                    <a href="services.html">SERVICES</a>
+                    <a href="gallery.html">GALLERY</a>
+                    <a href="shop.html">SHOP</a>
+                    <a href="blog.html">BLOG</a>
+                    <a href="about.html">ABOUT</a>
+                    <a href="contact.html">CONTACT</a>
+                    <a href="cart.html" class="cart-icon"><i class="fas fa-shopping-cart"></i> <span class="cart-count">0</span></a>
+                </div>
+                <div class="mobile-menu-btn">
+                    <div class="menu-bar"></div>
+                    <div class="menu-bar"></div>
+                    <div class="menu-bar"></div>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <!-- Hero Section -->
+    <section class="mechanical-hero">
+        <div class="hero-background">
+            <div class="gear-overlay gear-1"></div>
+            <div class="gear-overlay gear-2"></div>
+            <div class="gear-overlay gear-3"></div>
+            <div class="piston-overlay piston-1"></div>
+            <div class="piston-overlay piston-2"></div>
+        </div>
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="typing-animation">BIKETUNER | LAB<span class="highlight">WORKSHOP</span></h1>
+                <p class="slide-up-animation">Expert mechanical services for sports cars and high-performance motorcycles</p>
+                <div class="hero-buttons">
+                    <a href="#mechanical-services" class="btn btn-primary slide-in-left">OUR SERVICES</a>
+                    <a href="#appointment"class="btn btn-secondary slide-in-right">BOOK APPOINTMENT</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="bike-animation">
+                    <div class="bike-frame">
+                        <div class="bike-wheel front-wheel">
+                            <div class="wheel-spokes"></div>
+                        </div>
+                        <div class="bike-wheel rear-wheel">
+                            <div class="wheel-spokes"></div>
+                        </div>
+                        <div class="bike-engine">
+                            <div class="engine-detail"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="scrolling-indicator">
+            <div class="mouse">
+                <div class="wheel"></div>
+            </div>
+            <div class="arrow-down"></div>
+        </div>
+      <div class="mouse">
+                <div class="wheel"></div>
+            </div>
+            <div class="arrow-down"></div>
+        </div>
+    </section>
+    <!-- Client Brands Section -->
+<section class="client-brands">
+    <div class="section-header">
+        <h2>TRUSTED BY <span>LEADING</span> BRANDS</h2>
+        <div class="section-divider">
+            <div class="divider-line"></div>
+            <div class="divider-gear"></div>
+            <div class="divider-line"></div>
+        </div>
+        <p>We partner with the best in the industry</p>
+    </div>
+    
+    <div class="client-slider">
+      <div class="slider-track">
+        <!-- Client logos - use actual brand logos -->
+        <div class="slide">
+          <img src="https://cdn.worldvectorlogo.com/logos/trek-bicycle-corporation.svg" alt="Trek">
+        </div>
+        <div class="slide">
+          <img src="https://cdn.worldvectorlogo.com/logos/specialized-1.svg" alt="Specialized">
+        </div>
+        <div class="slide">
+          <img src="https://cdn.worldvectorlogo.com/logos/cannondale-2.svg" alt="Cannondale">
+        </div>
+        <div class="slide">
+          <img src="https://cdn.worldvectorlogo.com/logos/giant-3.svg" alt="Giant">
+        </div>
+        <div class="slide">
+          <img src="https://cdn.worldvectorlogo.com/logos/scott-sports-1.svg" alt="Scott">
+        </div>
+        <div class="slide">
+          <img src="https://cdn.worldvectorlogo.com/logos/cervelo.svg" alt="Cervelo">
+        </div>
+        <!-- Duplicate for seamless loop -->
+        <div class="slide">
+          <img src="https://cdn.worldvectorlogo.com/logos/trek-bicycle-corporation.svg" alt="Trek">
+        </div>
+        <div class="slide">
+          <img src="https://cdn.worldvectorlogo.com/logos/specialized-1.svg" alt="Specialized">
+        </div>
+        <div class="slide">
+          <img src="https://cdn.worldvectorlogo.com/logos/cannondale-2.svg" alt="Cannondale">
+        </div>
+        <div class="slide">
+          <img src="https://cdn.worldvectorlogo.com/logos/giant-3.svg" alt="Giant">
+        </div>
+      </div>
+    
+    <div class="cycle-animation">
+        <div class="bike-frame">
+            <div class="bike-wheel front-wheel">
+                <div class="wheel-spokes"></div>
+            </div>
+            <div class="bike-wheel rear-wheel">
+                <div class="wheel-spokes"></div>
+            </div>
+            <div class="bike-chain"></div>
+        </div>
+    </div>
+</section>
+
+    <!-- Services Section -->
+    <section id="mechanical-services"class="mechanical-services">
+        <div class="section-header">
+            <h2>OUR <span>EXPERT</span> SERVICES</h2>
+            <div class="section-divider">
+                <div class="divider-line"></div>
+                <div class="divider-gear"></div>
+                <div class="divider-line"></div>
+            </div>
+            <p>Premium mechanical services for your prized vehicles</p>
+        </div>
+        <div class="container">
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <div class="gear-icon">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                    </div>
+                    <h3>Engine Tuning</h3>
+                    <p>Precision ECU remapping and performance optimization for maximum power and efficiency.</p>
+                    <a href="#" class="service-link">Learn More <i class="fas fa-arrow-right"></i></a>
+                    <div class="service-hover-effect"></div>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <div class="gear-icon">
+                            <i class="fas fa-tachometer-alt"></i>
+                        </div>
+                    </div>
+                    <h3>Dyno Testing</h3>
+                    <p>Accurate horsepower and torque measurements with our state-of-the-art dynamometer.</p>
+                    <a href="#" class="service-link">Learn More <i class="fas fa-arrow-right"></i></a>
+                    <div class="service-hover-effect"></div>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <div class="gear-icon">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                    </div>
+                    <h3>Custom Fabrication</h3>
+                    <p>Bespoke parts and modifications tailored to your specific performance needs.</p>
+                    <a href="#" class="service-link">Learn More <i class="fas fa-arrow-right"></i></a>
+                    <div class="service-hover-effect"></div>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <div class="gear-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                    </div>
+                    <h3>Turbo Installation</h3>
+                    <p>Professional forced induction systems installation and tuning for extreme power gains.</p>
+                    <a href="#" class="service-link">Learn More <i class="fas fa-arrow-right"></i></a>
+                    <div class="service-hover-effect"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="mechanical-about">
+        <div class="container">
+            <div class="about-content">
+                <h2>WHY CHOOSE <span>BIKETUNNER</span></h2>
+                <div class="section-divider">
+                    <div class="divider-line"></div>
+                    <div class="divider-gear"></div>
+                    <div class="divider-line"></div>
+                </div>
+                <p>At BikeTunner, we combine cutting-edge technology with old-school craftsmanship to deliver unparalleled performance enhancements for your vehicles.</p>
+                
+                <div class="about-features">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-certificate"></i>
+                        </div>
+                        <div class="feature-text">
+                            <h4>Certified Technicians</h4>
+                            <p>Our team holds certifications from leading automotive and motorcycle manufacturers.</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="feature-text">
+                            <h4>Quick Turnaround</h4>
+                            <p>We value your time and strive to complete most services within 24-48 hours.</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="feature-text">
+                            <h4>Warranty Protected</h4>
+                            <p>All our work comes with a comprehensive warranty for your peace of mind.</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="feature-text">
+                            <h4>Race Proven</h4>
+                            <p>Our tuning solutions are tested and proven on the track before reaching your garage.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="about-image">
+                <div class="image-container">
+                    <div class="mech-animation">
+                        <div class="mech-arm"></div>
+                        <div class="mech-tool"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section class="mechanical-gallery">
+        <div class="section-header">
+            <h2>OUR <span>WORK</span> GALLERY</h2>
+            <div class="section-divider">
+                <div class="divider-line"></div>
+                <div class="divider-gear"></div>
+                <div class="divider-line"></div>
+            </div>
+            <p>Explore our recent projects and transformations</p>
+        </div>
+        <div class="gallery-container">
+            <div class="gallery-item">
+                        <img src="https://images.unsplash.com/photo-1485965120184-e220f721d03e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Bike Build">
+                <div class="gallery-overlay">
+                    <h3>Carbon Fiber Frame</h3>
+                    <p>-laid carbon fiber for optimal strength and weight</p>
+                    <a href="#" class="gallery-btn">View Details</a>
+                </div>
+            </div>
+                    <div class="gallery-container">
+            <div class="gallery-item">
+                        <img src="https://images.unsplash.com/photo-1507035895480-2b3156c31fc8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Bike Build">
+                <div class="gallery-overlay">
+                    <h3>Carbon Fiber Frame</h3>
+                    <p>-laid carbon fiber for optimal strength and weight</p>
+                    <a href="#" class="gallery-btn">View Details</a>
+                </div>
+            </div>
+            <div class="gallery-item">
+                        <img src="https://images.unsplash.com/photo-1532298229144-0ec0c57515c7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2022&q=80" alt="Bike Wheels">
+                        <div class="gallery-overlay">
+                            <h3>Aero Wheelset</h3>
+                            <p>Wind-tunnel tested for maximum efficiency</p>
+                    <a href="#" class="gallery-btn">View Details</a>
+                </div>
+            </div>
+            <div class="gallery-item">
+                        <img src="https://images.unsplash.com/photo-1576435728678-68d0fbf94e91?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2084&q=80" alt="Bike Fit">
+                        <div class="gallery-overlay">
+                            <h3>Custom Fit</h3>
+                            <p>3D motion capture for perfect geometry</p>
+                    <a href="#" class="gallery-btn">View Details</a>
+                </div>
+            </div>
+        </div>
+        <div class="gallery-cta">
+            <a href="gallery.html" class="btn btn-primary">VIEW FULL GALLERY</a>
+        </div>
+    </section>
+
+    <!-- Shop Section -->
+    <section class="mechanical-shop">
+        <div class="section-header">
+            <h2>PERFORMANCE <span>PARTS</span> SHOP</h2>
+            <div class="section-divider">
+                <div class="divider-line"></div>
+                <div class="divider-gear"></div>
+                <div class="divider-line"></div>
+            </div>
+            <p>Premium parts and accessories for your tuning needs</p>
+        </div>
+        <div class="container">
+            <div class="shop-grid">
+                <div class="product-card">
+                    <div class="product-badge">BESTSELLER</div>
+                    <div class="product-image">
+<img src="https://images.unsplash.com/photo-1511994298241-608e28f14fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Shimano Groupset">
+                            
+                        <div class="product-actions">
+                            <button class="quick-view"><i class="fas fa-eye"></i></button>
+                            <button class="add-wishlist"><i class="far fa-heart"></i></button>
+                        </div>
+                    </div>
+                    <div class="product-details">
+                        <h3>Akrapovic Titanium Exhaust</h3>
+                        <div class="product-price">$1,299.00</div>
+                        <div class="product-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                            <span>(24)</span>
+                        </div>
+                        <button class="add-to-cart">ADD TO CART</button>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-badge">NEW</div>
+                    <div class="product-image">
+<img src="https://images.unsplash.com/photo-1532298229144-0ec0c57515c7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2022&q=80" alt="Saddle">
+                        <div class="product-actions">
+                            <button class="quick-view"><i class="fas fa-eye"></i></button>
+                            <button class="add-wishlist"><i class="far fa-heart"></i></button>
+                        </div>
+                    </div>
+                    <div class="product-details">
+                        <h3>Cobb Accessport V3</h3>
+                        <div class="product-price">$675.00</div>
+                        <div class="product-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="far fa-star"></i>
+                            <span>(18)</span>
+                        </div>
+                        <button class="add-to-cart">ADD TO CART</button>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-image">
+                            <img src="https://images.unsplash.com/photo-1485965120184-e220f721d03e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Carbon Wheels">
+                        <div class="product-actions">
+                            <button class="quick-view"><i class="fas fa-eye"></i></button>
+                            <button class="add-wishlist"><i class="far fa-heart"></i></button>
+                        </div>
+                    </div>
+                    <div class="product-details">
+                        <h3>KW Variant 3 Coilovers</h3>
+                        <div class="product-price">$2,450.00</div>
+                        <div class="product-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <span>(32)</span>
+                        </div>
+                        <button class="add-to-cart">ADD TO CART</button>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-badge">SALE</div>
+                    <div class="product-image">
+                            <img src="https://images.unsplash.com/photo-1507035895480-2b3156c31fc8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Bike Tech">
+                        <div class="product-actions">
+                            <button class="quick-view"><i class="fas fa-eye"></i></button>
+                            <button class="add-wishlist"><i class="far fa-heart"></i></button>
+                        </div>
+                    </div>
+                    <div class="product-details">
+                        <h3>Brembo GT Big Brake Kit</h3>
+                        <div class="product-price"><span class="old-price">$3,999.00</span> $3,499.00</div>
+                        <div class="product-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                            <span>(41)</span>
+                        </div>
+                        <button class="add-to-cart">ADD TO CART</button>
+                    </div>
+                </div>
+            </div>
+                            <div class="product-card">
+                    <div class="product-badge">SALE</div>
+                    <div class="product-image">
+                            <img src="https://images.unsplash.com/photo-1576435728678-68d0fbf94e91?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2084&q=80" alt="Pedals">
+                        <div class="product-actions">
+                            <button class="quick-view"><i class="fas fa-eye"></i></button>
+                            <button class="add-wishlist"><i class="far fa-heart"></i></button>
+                        </div>
+                    </div>
+                    <div class="product-details">
+                        <h3>Brembo GT Big Brake Kit</h3>
+                        <div class="product-price"><span class="old-price">$3,999.00</span> $3,499.00</div>
+                        <div class="product-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                            <span>(41)</span>
+                        </div>
+                        <button class="add-to-cart">ADD TO CART</button>
+                    </div>
+                </div>
+            </div>
+            <div class="shop-cta">
+                <a href="shop.html" class="btn btn-secondary">VIEW ALL PRODUCTS</a>
+            </div>
+        </div>
+    </section>
+    <!-- Client Logo Slider -->
+<section class="client-slider-section">
+  <div class="container">
+    <h3>OUR TRUSTED PARTNERS</h3>
+    
+    <div class="client-slider">
+      <div class="slider-track">
+        <!-- Client logos - use actual brand logos -->
+        <div class="slide">
+          <img src="https://cdn.worldvectorlogo.com/logos/trek-bicycle-corporation.svg" alt="Trek">
+        </div>
+        <div class="slide">
+          <img src="https://cdn.worldvectorlogo.com/logos/specialized-1.svg" alt="Specialized">
+        </div>
+        <div class="slide">
+          <img src="https://cdn.worldvectorlogo.com/logos/cannondale-2.svg" alt="Cannondale">
+        </div>
+        <div class="slide">
+          <img src="https://cdn.worldvectorlogo.com/logos/giant-3.svg" alt="Giant">
+        </div>
+        <div class="slide">
+          <img src="https://cdn.worldvectorlogo.com/logos/scott-sports-1.svg" alt="Scott">
+        </div>
+        <div class="slide">
+          <img src="https://cdn.worldvectorlogo.com/logos/cervelo.svg" alt="Cervelo">
+        </div>
+        <!-- Duplicate for seamless loop -->
+        <div class="slide">
+          <img src="https://cdn.worldvectorlogo.com/logos/trek-bicycle-corporation.svg" alt="Trek">
+        </div>
+        <div class="slide">
+          <img src="https://cdn.worldvectorlogo.com/logos/specialized-1.svg" alt="Specialized">
+        </div>
+        <div class="slide">
+          <img src="https://cdn.worldvectorlogo.com/logos/cannondale-2.svg" alt="Cannondale">
+        </div>
+        <div class="slide">
+          <img src="https://cdn.worldvectorlogo.com/logos/giant-3.svg" alt="Giant">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+    <!-- Testimonials Section -->
+    <section class="mechanical-testimonials">
+        <div class="section-header">
+            <h2>CLIENT <span>TESTIMONIALS</span></h2>
+            <div class="section-divider">
+                <div class="divider-line"></div>
+                <div class="divider-gear"></div>
+                <div class="divider-line"></div>
+            </div>
+            <p>What our customers say about our services</p>
+        </div>
+        <div class="container">
+            <div class="testimonial-slider">
+                <div class="testimonial-slide active">
+                    <div class="testimonial-content">
+                        <div class="testimonial-quote">
+                            <i class="fas fa-quote-left"></i>
+                            <p>BikeTunner transformed my Ducati Panigale into an absolute beast! The attention to detail and technical expertise is unmatched. Gained 25hp from their ECU tune alone.</p>
+                            <i class="fas fa-quote-right"></i>
+                        </div>
+                        <div class="testimonial-author">
+                            <div class="author-image">
+                        <img src="https://images.unsplash.com/photo-1485965120184-e220f721d03e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Bike Build">
+                            </div>
+                            <div class="author-info">
+                                <h4>Michael R.</h4>
+                                <span>Ducati Panigale V4</span>
+                                <div class="testimonial-rating">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-slide">
+                    <div class="testimonial-content">
+                        <div class="testimonial-quote">
+                            <i class="fas fa-quote-left"></i>
+                            <p>The team at BikeTunner did an incredible job on my Nissan GT-R. The custom turbo setup delivers power exactly how I wanted - brutal but controllable. Highly recommend!</p>
+                            <i class="fas fa-quote-right"></i>
+                        </div>
+                        <div class="testimonial-author">
+                            <div class="author-image">
+                        <img src="https://images.unsplash.com/photo-1485965120184-e220f721d03e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Bike Build">
+                            </div>
+                            <div class="author-info">
+                                <h4>Sarah K.</h4>
+                                <span>Nissan GT-R</span>
+                                <div class="testimonial-rating">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-slide">
+                    <div class="testimonial-content">
+                        <div class="testimonial-quote">
+                            <i class="fas fa-quote-left"></i>
+                            <p>After trying several tuners for my track-prepped BMW S1000RR, BikeTunner finally got it right. The bike makes power everywhere and is incredibly smooth. Shaved 1.5 seconds off my lap times!</p>
+                            <i class="fas fa-quote-right"></i>
+                        </div>
+                        <div class="testimonial-author">
+                            <div class="author-image">
+                        <img src="https://images.unsplash.com/photo-1485965120184-e220f721d03e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Bike Build">
+                            </div>
+                            <div class="author-info">
+                                <h4>David L.</h4>
+                                <span>BMW S1000RR</span>
+                                <div class="testimonial-rating">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-controls">
+                    <button class="testimonial-prev"><i class="fas fa-chevron-left"></i></button>
+                    <button class="testimonial-next"><i class="fas fa-chevron-right"></i></button>
+                </div>
+                <div class="testimonial-dots">
+                    <span class="dot active"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Blog Section -->
+    <section class="mechanical-blog">
+        <div class="section-header">
+            <h2>LATEST <span>NEWS</span> & ARTICLES</h2>
+            <div class="section-divider">
+                <div class="divider-line"></div>
+                    <div class="divider-gear"></div>
+                <div class="divider-line"></div>
+            </div>
+            <p>Stay updated with our workshop news and tuning tips</p>
+        </div>
+        <div class="container">
+            <div class="blog-grid">
+                <div class="blog-card">
+                    <div class="blog-image">
+                            <img src="https://images.unsplash.com/photo-1507035895480-2b3156c31fc8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Bike Tech">
+                        <div class="blog-date">
+                            <span class="date-day">15</span>
+                            <span class="date-month">JUN</span>
+                        </div>
+                    </div>
+                    <div class="blog-content">
+                        <div class="blog-meta">
+                            <span><i class="fas fa-user"></i> Admin</span>
+                            <span><i class="fas fa-comments"></i> 8 Comments</span>
+                        </div>
+                        <h3><a href="#">The Complete Guide to ECU Tuning for Performance</a></h3>
+                        <p>Learn how modern ECU tuning can unlock hidden potential in your vehicle while maintaining reliability...</p>
+                        <a href="#" class="blog-read-more">READ MORE <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+                <div class="blog-card">
+                    <div class="blog-image">
+                            <img src="https://images.unsplash.com/photo-1511994298241-608e28f14fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Bike Fit">
+                        <div class="blog-date">
+                            <span class="date-day">28</span>
+                            <span class="date-month">MAY</span>
+                        </div>
+                    </div>
+                    <div class="blog-content">
+                        <div class="blog-meta">
+                            <span><i class="fas fa-user"></i> Admin</span>
+                            <span><i class="fas fa-comments"></i> 14 Comments</span>
+                        </div>
+                        <h3><a href="#">Turbocharging 101: What You Need to Know Before Upgrading</a></h3>
+                        <p>Everything you need to consider before adding forced induction to your naturally aspirated engine...</p>
+                        <a href="#" class="blog-read-more">READ MORE <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+                <div class="blog-card">
+                    <div class="blog-image">
+                            <img src="https://images.unsplash.com/photo-1485965120184-e220f721d03e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Bike Maintenance">
+                        <div class="blog-date">
+                            <span class="date-day">05</span>
+                            <span class="date-month">MAY</span>
+                        </div>
+                    </div>
+                    <div class="blog-content">
+                        <div class="blog-meta">
+                            <span><i class="fas fa-user"></i> Admin</span>
+                            <span><i class="fas fa-comments"></i> 6 Comments</span>
+                        </div>
+                        <h3><a href="#">Prepping Your Bike for Track Days: Essential Modifications</a></h3>
+                        <p>Key modifications that will make your motorcycle faster and safer on the racetrack without breaking the bank...</p>
+                        <a href="#" class="blog-read-more">READ MORE <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="mechanical-cta">
+        <div class="cta-background">
+            <div class="cta-gear cta-gear1"></div>
+            <div class="cta-gear cta-gear2"></div>
+            <div class="cta-gear cta-gear3"></div>
+        </div>
+        <div class="container">
+            <div class="cta-content">
+                <h2>READY TO UNLEASH YOUR VEHICLE'S <span>TRUE POTENTIAL</span>?</h2>
+                <p>Schedule an appointment with our tuning specialists today</p>
+                <div class="cta-buttons">
+                    <a href="contact.html" class="btn btn-primary">BOOK NOW</a>
+                    <a href="tel:+15551234567" class="btn btn-secondary"><i class="fas fa-phone-alt"></i> CALL US</a>
+                </div>
+            </div>
+        </div>
+    </section>
+<!-- ADVANCED APPOINTMENT SCHEDULER SECTION -->
+<section id="appointment" class="mechanical-cta appointment-section">
+    <div class="scheduler-container">
+        <div class="scheduler-header">
+            <h2><span>Book Your</span> Service</h2>
+            <p>Your vehicle's transformation starts here. Let's get you on the schedule.</p>
+        </div>
+
+        <div class="scheduler-card">
+            <div class="progress-bar">
+                <div class="progress-bar__step active" data-step="1">Service</div>
+                <div class="progress-bar__line"></div>
+                <div class="progress-bar__step" data-step="2">Schedule</div>
+                <div class="progress-bar__line"></div>
+                <div class="progress-bar__step" data-step="3">Details</div>
+            </div>
+
+            <form id="appointmentForm" class="scheduler-form">
+                <!-- Step 1: Service Selection -->
+                <div class="scheduler__step active" data-step="1">
+                    <h4>1. Select Your Service</h4>
+                    <div class="service-options">
+                        <div class="service-option" data-service="Engine Tuning">
+                            <i class="fas fa-cog"></i><span>Engine Tuning</span>
+                        </div>
+                        <div class="service-option" data-service="Dyno Testing">
+                            <i class="fas fa-tachometer-alt"></i><span>Dyno Testing</span>
+                        </div>
+                        <div class="service-option" data-service="Suspension Setup">
+                            <i class="fas fa-cogs"></i><span>Suspension Setup</span>
+                        </div>
+                        <div class="service-option" data-service="Brake Upgrades">
+                            <i class="fas fa-car-battery"></i><span>Brake Upgrades</span>
+                        </div>
+                         <div class="service-option" data-service="Custom Fabrication">
+                            <i class="fas fa-tools"></i><span>Custom Fabrication</span>
+                        </div>
+                        <div class="service-option" data-service="Diagnostics">
+                            <i class="fas fa-microchip"></i><span>Diagnostics</span>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary next-btn">Next</button>
+                </div>
+
+                <!-- Step 2: Date & Time -->
+                <div class="scheduler__step" data-step="2">
+                    <h4>2. Choose Date & Time</h4>
+                    <input type="text" id="datePicker" placeholder="Select a date...">
+                    <div class="time-slots">
+                        <!-- Time slots will be dynamically generated here -->
+                    </div>
+                    <div class="step-nav">
+                        <button type="button" class="btn btn-secondary prev-btn">Back</button>
+                        <button type="button" class="btn btn-primary next-btn">Next</button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Personal Details -->
+                <div class="scheduler__step" data-step="3">
+                    <h4>3. Your Information</h4>
+                    <input type="text" name="name" placeholder="Full Name" required>
+                    <input type="email" name="email" placeholder="Email Address" required>
+                    <input type="text" name="vehicle" placeholder="Vehicle (e.g., Ducati Panigale V4)" required>
+                    <div class="step-nav">
+                         <button type="button" class="btn btn-secondary prev-btn">Back</button>
+                         <button type="submit" class="btn btn-primary submit-btn">
+                            <span class="btn-text">Book My Appointment</span>
+                            <span class="btn-loader"></span>
+                         </button>
+                    </div>
+                </div>
+
+                <!-- Step 4: Success Message -->
+                <div class="scheduler__step scheduler__success" data-step="4">
+                    <svg class="success-checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                        <circle class="success-checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+                        <path class="success-checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                    </svg>
+                    <h4>Appointment Confirmed!</h4>
+                    <p>We've sent a confirmation to your email. We look forward to seeing you!</p>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+    <!-- Footer -->
+    <footer id="mechanical-footer"class="mechanical-footer">
+        <div class="footer-top">
+            <div class="container">
+                <div class="footer-widget">
+                    <div class="footer-logo">
+                        <span class="logo-text">BIKETUNNER</span>
+                        <span class="logo-subtext">PERFORMANCE WORKSHOP</span>
+                    </div>
+                    <p>Precision tuning and mechanical services for sports cars and high-performance motorcycles. We combine cutting-edge technology with decades of hands-on experience.</p>
+                    <div class="footer-social">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+
+
+
+                <div class="footer-widget">
+                    <h3>OUR SERVICES</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Engine Tuning</a></li>
+                        <li><a href="#">Dyno Testing</a></li>
+                        <li><a href="#">Turbo Installation</a></li>
+                        <li><a href="#">Suspension Setup</a></li>
+                        <li><a href="#">Brake Upgrades</a></li>
+                        <li><a href="#">Custom Fabrication</a></li>
+                        <li><a href="#">Vehicle Diagnostics</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-widget">
+                    <h3>Our Lair</h3>
+                     <div id="map">
+                        <iframe 
+                          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3769.2253882557353!2d72.85656421433023!3d19.2084284869995!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7b0fdf497e2d7%3A0x7a4c789efb6cd428!2sBikeTunner%20Mira%20Road!5e0!3m2!1sen!2sin!4v1693983765712!5m2!1sen!2sin"
+                          width="100%" 
+                          height="100%" 
+                          style="border:0;" 
+                          allowfullscreen="" 
+                          loading="lazy" 
+                          referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+                    </div>
+                </div>
+                <div class="footer-widget">
+                    <h3>CONTACT INFO</h3>
+                    <ul class="footer-contact">
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Garage St, Motor City, MC 12345</li>
+                        <li><i class="fas fa-phone-alt"></i> +1 (555) 123-4567</li>
+                        <li><i class="fas fa-envelope"></i> contact@biketunner.com</li>
+                        <li><i class="fas fa-clock"></i> Mon-Fri: 9:00AM - 6:00PM<br>Sat: 10:00AM - 4:00PM</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <div class="copyright">
+                    &copy; 2023 BikeTunner Performance Workshop. All Rights Reserved.
+                </div>
+                <div class="footer-links-bottom">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Sitemap</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <div class="back-to-top">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // --- Preloader ---
+    const preloader = document.querySelector('.preloader');
+    window.addEventListener('load', function() {
+        setTimeout(() => {
+            preloader.classList.add('fade-out');
+            setTimeout(() => preloader.style.display = 'none', 500);
+        }, 1500);
+    });
+
+    // --- Mobile Menu ---
+    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+    const navLinks = document.querySelector('.nav-links');
+    mobileMenuBtn.addEventListener('click', () => {
+        mobileMenuBtn.classList.toggle('active');
+        navLinks.classList.toggle('active');
+    });
+    document.querySelectorAll('.nav-links a').forEach(link => {
+        link.addEventListener('click', () => {
+            mobileMenuBtn.classList.remove('active');
+            navLinks.classList.remove('active');
+        });
+    });
+
+    // --- Sticky Header ---
+    const header = document.querySelector('.mechanical-nav');
+    window.addEventListener('scroll', () => {
+        header.classList.toggle('scrolled', window.scrollY > 100);
+    });
+
+    // --- Back to Top ---
+    const backToTopBtn = document.querySelector('.back-to-top');
+    window.addEventListener('scroll', () => {
+        backToTopBtn.classList.toggle('active', window.scrollY > 300);
+    });
+    backToTopBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // --- Testimonial Slider ---
+    const testimonialSlides = document.querySelectorAll('.testimonial-slide');
+    const testimonialDots = document.querySelectorAll('.dot');
+    let currentSlide = 0;
+
+    function showSlide(index) {
+        testimonialSlides.forEach(slide => slide.classList.remove('active'));
+        testimonialDots.forEach(dot => dot.classList.remove('active'));
+        testimonialSlides[index].classList.add('active');
+        testimonialDots[index].classList.add('active');
+        currentSlide = index;
+    }
+    document.querySelector('.testimonial-prev')?.addEventListener('click', () => {
+        showSlide((currentSlide - 1 + testimonialSlides.length) % testimonialSlides.length);
+    });
+    document.querySelector('.testimonial-next')?.addEventListener('click', () => {
+        showSlide((currentSlide + 1) % testimonialSlides.length);
+    });
+    testimonialDots.forEach((dot, index) => {
+        dot.addEventListener('click', () => showSlide(index));
+    });
+    setInterval(() => showSlide((currentSlide + 1) % testimonialSlides.length), 5000);
+// --- GSAP Scroll Animations ---
+    gsap.registerPlugin(ScrollTrigger);
+    gsap.utils.toArray('.service-card, .product-card, .blog-card, .gallery-item').forEach(item => {
+        gsap.from(item, {
+            scrollTrigger: { trigger: item, start: "top 80%" },
+            opacity: 0, y: 50, duration: 0.8, ease: "power2.out"
+        });
+    });
+
+    // --- Appointment System ---
+    const form = document.getElementById('appointmentForm');
+    const timeSlotsContainer = document.querySelector('.time-slots');
+    const appointmentData = { service: null, date: null, time: null, name: null, email: null, vehicle: null };
+    let currentStep = 1, totalSteps = 3;
+
+    flatpickr("#datePicker", {
+        minDate: "today", dateFormat: "Y-m-d",
+        onChange: (selectedDates, dateStr) => {
+            appointmentData.date = dateStr;
+            generateTimeSlots(dateStr);
+            validateStep(2);
+        }
+    });
+
+    // --- Time Slot Generator ---
+    function generateTimeSlots(dateStr) {
+        const slots = [], opening = 9, closing = 18, bookedSlots = ['11:00', '14:00'];
+        for (let h = opening; h < closing; h++) {
+            slots.push(`${h}:00`, `${h}:30`);
+        }
+        timeSlotsContainer.innerHTML = '';
+        slots.forEach(time => {
+            const el = document.createElement('div');
+            el.className = 'time-slot';
+            el.textContent = time;
+            if (bookedSlots.includes(time)) el.classList.add('disabled');
+            else {
+                el.addEventListener('click', () => {
+                    document.querySelectorAll('.time-slot').forEach(t => t.classList.remove('selected'));
+                    el.classList.add('selected');
+                    appointmentData.time = time;
+                    validateStep(2);
+                });
+            }
+            timeSlotsContainer.appendChild(el);
+        });
+        gsap.from(timeSlotsContainer.children, {
+            duration: 0.3, opacity: 0, scale: 0.8, stagger: 0.05, ease: 'back.out(1.7)'
+        });
+    }
+
+    // --- Appointment Steps ---
+    const nextBtns = form.querySelectorAll('.next-btn');
+    const prevBtns = form.querySelectorAll('.prev-btn');
+    const progressSteps = document.querySelectorAll('.progress-bar__step');
+    const serviceOptions = document.querySelectorAll('.service-option');
+    const tl = gsap.timeline();
+
+    nextBtns.forEach(btn => btn.addEventListener('click', () => navigateToStep(currentStep + 1)));
+    prevBtns.forEach(btn => btn.addEventListener('click', () => navigateToStep(currentStep - 1)));
+
+    serviceOptions.forEach(option => {
+        option.addEventListener('click', () => {
+            serviceOptions.forEach(o => o.classList.remove('selected'));
+            option.classList.add('selected');
+            appointmentData.service = option.dataset.service;
+            validateStep(1);
+        });
+    });
+
+    function navigateToStep(step) {
+        if (step < 1 || step > totalSteps + 1) return;
+        const currEl = form.querySelector(`.scheduler__step[data-step="${currentStep}"]`);
+        const nextEl = form.querySelector(`.scheduler__step[data-step="${step}"]`);
+        tl.to(currEl, {
+            duration: 0.3, opacity: 0, x: -30, ease: 'power2.in',
+            onComplete: () => {
+                currEl.classList.remove('active');
+                nextEl.classList.add('active');
+                gsap.fromTo(nextEl, { opacity: 0, x: 30 }, { duration: 0.5, opacity: 1, x: 0, ease: 'power2.out' });
+            }
+        });
+        currentStep = step;
+        updateProgressBar();
+    }
+
+    function updateProgressBar() {
+        progressSteps.forEach(step => {
+            step.classList.toggle('active', parseInt(step.dataset.step) <= currentStep);
+        });
+    }
+
+    function validateStep(stepNum) {
+        const stepEl = form.querySelector(`.scheduler__step[data-step="${stepNum}"]`);
+        const nextBtn = stepEl.querySelector('.next-btn');
+        let valid = false;
+        if (stepNum === 1) valid = !!appointmentData.service;
+        if (stepNum === 2) valid = !!appointmentData.date && !!appointmentData.time;
+        if (nextBtn) {
+            nextBtn.disabled = !valid;
+            nextBtn.style.cursor = valid ? 'pointer' : 'not-allowed';
+            nextBtn.style.opacity = valid ? '1' : '0.5';
+        }
+    }
+
+    // --- Final Submit ---
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        appointmentData.name = form.querySelector('[name="name"]').value;
+        appointmentData.email = form.querySelector('[name="email"]').value;
+        appointmentData.vehicle = form.querySelector('[name="vehicle"]').value;
+
+        const submitBtn = e.target.querySelector('.submit-btn');
+        const btnText = submitBtn.querySelector('.btn-text');
+        submitBtn.classList.add('loading');
+        submitBtn.disabled = true;
+
+        await new Promise(res => setTimeout(res, 1500)); // Simulate API
+
+        navigateToStep(4);
+        gsap.set('.success-checkmark', { autoAlpha: 1 });
+        gsap.fromTo('.success-checkmark__circle', { strokeDashoffset: 166 }, { strokeDashoffset: 0, duration: 0.8 });
+        gsap.fromTo('.success-checkmark__check', { strokeDashoffset: 48 }, { strokeDashoffset: 0, duration: 0.5, delay: 0.5 });
+
+        // Google Calendar URL
+        const calURL = generateGoogleCalendarURL(appointmentData);
+        setTimeout(() => {
+            window.open(calURL, '_blank');
+        }, 1000);
+    });
+     function generateGoogleCalendarURL({ name, service, date, time }) {
+        const [h, m] = time.split(':');
+        const start = new Date(`${date}T${time}`);
+        const end = new Date(start.getTime() + 30 * 60000); // 30 mins slot
+        const format = d => d.toISOString().replace(/-|:|\.\d+/g, '');
+        const text = encodeURIComponent(`Appointment: ${service}`);
+        const details = encodeURIComponent(`With: ${name}`);
+        return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${format(start)}/${format(end)}&details=${details}`;
+    }
+
+    validateStep(1);
+    validateStep(2);
+
+    // --- Cursor Bounce for Slider Images ---
+    const slider = document.querySelector('.slider-track');
+    slider?.addEventListener('mouseenter', () => slider.style.animationPlayState = 'paused');
+    slider?.addEventListener('mouseleave', () => slider.style.animationPlayState = 'running');
+    document.querySelectorAll('.slide').forEach(slide => {
+        slide.addEventListener('mouseenter', () => {
+            gsap.to(slide, { y: -5, duration: 0.3 });
+        });
+        slide.addEventListener('mouseleave', () => {
+            gsap.to(slide, { y: 0, duration: 0.3 });
+        });
+    });
+});
+function navigateToStep(step) {
+    if (step < 1 || step > totalSteps + 1) return;
+
+    const currEl = form.querySelector(`.scheduler__step[data-step="${currentStep}"]`);
+    const nextEl = form.querySelector(`.scheduler__step[data-step="${step}"]`);
+
+    const tl = gsap.timeline();
+    tl.to(currEl, {
+        duration: 0.4,
+        opacity: 0,
+        scale: 0.9,
+        x: -50,
+        ease: "power3.inOut",
+        onComplete: () => {
+            currEl.classList.remove('active');
+            nextEl.classList.add('active');
+        }
+    }).fromTo(nextEl, {
+        opacity: 0,
+        scale: 1.1,
+        x: 50
+    }, {
+        duration: 0.5,
+        opacity: 1,
+        scale: 1,
+        x: 0,
+        ease: "back.out(1.4)"
+    });
+
+    currentStep = step;
+    updateProgressBar();
+}
+const cursorTrail = [];
+for (let i = 0; i < 10; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'cursor-dot';
+    document.body.appendChild(dot);
+    cursorTrail.push(dot);
+}
+
+let mouseX = 0, mouseY = 0;
+document.addEventListener('mousemove', e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+});
+
+gsap.ticker.add(() => {
+    cursorTrail.forEach((dot, index) => {
+        const prev = index === 0 ? { x: mouseX, y: mouseY } : cursorTrail[index - 1].getBoundingClientRect();
+        gsap.set(dot, {
+            x: prev.x,
+            y: prev.y
+        });
+    });
+});
+</script>
+
+    <!-- ... all your website content ... -->
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
